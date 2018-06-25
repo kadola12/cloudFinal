@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Data.Entity;
+using System.Data.Entity.SqlServer;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Libreria.Models
 {
     public class Persona
     {
+        [Key]
         public string Id { get; set; }
         public string Nombre { get; set; }
         public string Estudiante { get; set; }

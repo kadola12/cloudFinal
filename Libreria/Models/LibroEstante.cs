@@ -7,13 +7,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Libreria.Models
 {
-    public class PersonaLibro
+    public class LibroEstante
     {
         [Key]
-        public string IdPersona { get; set; }
         public int IdLibro { get; set; }
-        public DateTime FechaSalida { get; set; }
-        public DateTime FechaDevolucion { get; set; }
-
+        public int IdEstante { get; set; }
     }
 }
