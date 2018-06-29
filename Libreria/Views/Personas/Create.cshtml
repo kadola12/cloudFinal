@@ -63,7 +63,7 @@
         </div>
         <div class="form-group">
             <div class="control-label col-md-2">
-                <form  method="post" enctype="multipart/form-data" action="/MemberPhotos/Uploaded">
+                <form  method="post" enctype="multipart/form-data" action="/profile/upload">
 
                     <label for="file">Agregar Foto</label>
                     <input type="file" name="file" id="file" />
@@ -77,6 +77,6 @@
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+    <div>
+        @Html.ActionLink("Ver lista de Personas", "Index")
+    </div>

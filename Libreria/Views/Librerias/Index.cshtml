@@ -1,27 +1,22 @@
 ﻿@model IEnumerable<Libreria.Models.Librerias>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Gestion Biblioteca";
 }
 
-<h2>Index</h2>
+<h2>Biblioteca</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Gestion de Personas", "Index", "Personas", new { area = "" }, new { @class = "navbar-brand" })
+    @Html.ActionLink("Gestion de Estantes", "Index", "Estantes", new { area = "" }, new { @class = "navbar-brand" })
+    @Html.ActionLink("Gestion de Libros", "Index", "Libroes", new { area = "" }, new { @class = "navbar-brand" })
+    
 </p>
 <table class="table">
     <tr>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.id })
-        </td>
-    </tr>
-}
+
 
 </table>

@@ -53,12 +53,12 @@ namespace Libreria.Models
             };
             libros.ForEach(u => context.libros.Add(u));
             context.SaveChanges();
-            /*var personas = new List<Persona>
+            var personas = new List<Persona>
             {
                 new Persona{Nombre="Paola Serpa", Genero=1, Estudiante="Universitario", Correo="paola.serpa@ucuenca.edu.ec", Edad=20}
             };
             personas.ForEach(v => context.personas.Add(v));
-            context.SaveChanges();*/
+            context.SaveChanges();
         }
     }
 

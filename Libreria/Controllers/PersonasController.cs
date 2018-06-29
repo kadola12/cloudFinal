@@ -61,16 +61,17 @@ namespace Libreria.Controllers
                 //Console.WriteLine(file.FileName);
                 //if (file != null)
                 //{
-                    
-                    //HttpPostedFileBase file = Request.Files[0];
-                    //Console.WriteLine("hola"+file);
-                    //if (file.ContentLength > 0)
-                    //{
+               
+                    //Console.WriteLine("hola"+file.ToString());
+                persona.Nombre = file.ToString();
+                return View(persona);
+                    if (file != null)
+                    {
                         identificarPersona(file);
                         db.personas.Add(persona);
                         db.SaveChanges();
                         return RedirectToAction("Index");
-                    //}
+                    }
                     //var fileName = Path.GetFileName(file.FileName);
                     //Guarda el archivo
                     //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
