@@ -16,12 +16,13 @@ namespace Libreria.Models
         public List<LibroEstante> libroEstantes { get; set; }
         public List <Persona> personas { get; set; }
         public List <PersonaLibro> personaLibros { get; set; }
+        public List <FotoPersona> fotoPersonas { get; set; }
         
     }
 
     public class LibreroContext : DbContext
     {
-        public LibreroContext() : base("Librero")
+        public LibreroContext() : base("Libreria")
         {
 
         }
@@ -31,6 +32,7 @@ namespace Libreria.Models
         public DbSet<Persona> personas { get; set; }
         public DbSet<PersonaLibro> personaLibros { get; set; }
         public DbSet<Librerias> Librerias { get; set; }
+        public DbSet<FotoPersona> fotoPersonas { get; set; }
     }
 
     public class LibreroInitializer : CreateDatabaseIfNotExists<LibreroContext>

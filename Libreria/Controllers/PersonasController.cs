@@ -7,13 +7,21 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Libreria.Models;
+using System.Windows;
+using System.Configuration;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Net.Http;
+using System.Drawing;
+using System.Diagnostics;
+
 
 namespace Libreria.Controllers
 {
     public class PersonasController : Controller
     {
         private LibreroContext db = new LibreroContext();
-
+        private static string ServiceKey = ConfigurationManager.AppSettings["FaceServiceKey"];
         // GET: Personas
         public ActionResult Index()
         {
@@ -46,13 +54,31 @@ namespace Libreria.Controllers
         // más información vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Nombre,Estudiante,Genero,Edad,Correo")] Persona persona)
+        public ActionResult Create([Bind(Include = "Id,Nombre,Estudiante,Genero,Edad,Correo")] Persona persona, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
-                db.personas.Add(persona);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                //Console.WriteLine(file.FileName);
+                //if (file != null)
+                //{
+                    
+                    //HttpPostedFileBase file = Request.Files[0];
+                    //Console.WriteLine("hola"+file);
+                    //if (file.ContentLength > 0)
+                    //{
+                        identificarPersona(file);
+                        db.personas.Add(persona);
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                    //}
+                    //var fileName = Path.GetFileName(file.FileName);
+                    //Guarda el archivo
+                    //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+                    //file.SaveAs(path);
+                    
+                //}
+                //Console.WriteLine(Request.Files.Count);
+                //return View(persona);
             }
 
             return View(persona);
@@ -123,5 +149,32 @@ namespace Libreria.Controllers
             }
             base.Dispose(disposing);
         }
+
+        
+
+        public void identificarPersona(HttpPostedFileBase file)
+        {
+            var client = new HttpClient();
+            //var queryString = HttpUtility.ParseQueryString();
+
+            // Request headers
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ServiceKey);
+
+            var uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/identify?" + file;
+
+            //HttpResponseMessage response;
+
+            // Request body
+            byte[] byteData = Encoding.UTF8.GetBytes("{body}");
+
+            using (var content = new ByteArrayContent(byteData))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("< your content type, i.e. application/json >");
+                //response = client.PostAsync(uri, content);
+            }
+
+        }
+
     }
+
 }
