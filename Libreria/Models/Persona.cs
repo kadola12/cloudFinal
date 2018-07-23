@@ -17,7 +17,7 @@ namespace Libreria.Models
         public int Edad { get; set; }
         public string Correo { get; set; }
         //public blob Foto { get; set; }
-       
+
     }
 
 

@@ -1,7 +1,7 @@
 ﻿@model Libreria.Models.Libro
 
 @{
-    ViewBag.Title = "Detalle";
+    ViewBag.Title = "Details";
 }
 
 <h2>Details</h2>
@@ -35,16 +35,32 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.anio)
+            @Html.DisplayNameFor(model => model.Anio)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.anio)
+            @Html.DisplayFor(model => model.Anio)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Foto)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Foto)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Editorial)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Editorial)
         </dd>
 
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Editar", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Ver lista de Libros", "Index")
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
 </p>
