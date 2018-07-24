@@ -196,10 +196,10 @@ namespace Libreria.Controllers
         public string identificarPersona(string imagenFilePath)
         {
 
-            /*var url = "https://libros.westeurope.cloudapp.azure.com/getcategoria";
+            var url = "https://libros.westeurope.cloudapp.azure.com/getcategoria";
             var client = new WebClient();
             var content = client.DownloadString("http://libros.westeurope.cloudapp.azure.com/getcategoria");
-            return content.ToString();*/
+            return content.ToString();
 
             /*string strResult = string.Empty;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://libros.westeurope.cloudapp.azure.com/getcategoria");
