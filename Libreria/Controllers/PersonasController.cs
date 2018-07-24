@@ -18,6 +18,7 @@ using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using System.IO;
 using System.Windows.Input;
+using Newtonsoft.Json.Linq;
 //https://www.mikesdotnetting.com/article/259/asp-net-mvc-5-with-ef-6-working-with-files
 
 namespace Libreria.Controllers
@@ -77,9 +78,9 @@ namespace Libreria.Controllers
             //Console.WriteLine("hola"+file.ToString());
 
             //return View(persona);
-            Console.WriteLine("Inicio");
-            //ViewBag.Message = System.IO.Path.GetFullPath(file.FileName).Length;
-                //return View();
+            //Console.WriteLine("Inicio");
+            //ViewBag.Message = System.IO.Path.GetFullPath(file.FileName);
+            //return View();
                 try
                     {
                         string fileName = System.IO.Path.GetFullPath(file.FileName);
@@ -88,11 +89,12 @@ namespace Libreria.Controllers
 
                             //ViewBag.Message="Lo logramos";
                             //return View();
-                            identificarPersona(fileName);
+                            //identificarPersona(fileName);
                             //db.personas.Add(persona);
                             //db.SaveChanges();
                             
-                            return RedirectToAction("Index");
+                            ViewBag.Message = identificarPersona(fileName);
+                            return View();
                         }
                         else
                         {
@@ -191,9 +193,65 @@ namespace Libreria.Controllers
             base.Dispose(disposing);
         }
 
-        
+        public string identificarPersona(string imagenFilePath)
+        {
 
-        public async void identificarPersona(string imageFilePath)
+            /*var url = "https://libros.westeurope.cloudapp.azure.com/getcategoria";
+            var client = new WebClient();
+            var content = client.DownloadString("http://libros.westeurope.cloudapp.azure.com/getcategoria");
+            return content.ToString();*/
+
+            /*string strResult = string.Empty;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://libros.westeurope.cloudapp.azure.com/getcategoria");
+            request.Method = "GET";
+            request.ContentType = "application/json";
+            HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
+            Encoding enc = System.Text.Encoding.GetEncoding("utf-8");
+            StreamReader ioResponseStream = new StreamReader(webResponse.GetResponseStream(), enc);
+            strResult = ioResponseStream.ReadToEnd();
+            ioResponseStream.Close();
+            webResponse.Close();
+            return strResult;*/
+
+
+            /*var url = "http://libros.westeurope.cloudapp.azure.com/getcategoria";
+            var webrequest = (HttpWebRequest)System.Net.WebRequest.Create(url);
+            string resultado;
+            using (var response = webrequest.GetResponse())
+            using (var reader = new StreamReader(response.GetResponseStream()))
+            {
+                var result = reader.ReadToEnd();
+                resultado = Convert.ToString(result);
+            }
+            return resultado;*/
+
+            /*try
+            {
+                WebResponse response = request.GetResponse();
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream, System.Text.Encoding.UTF8);
+                    return reader.ReadToEnd();
+                }
+            }
+            catch (WebException ex)
+            {
+                WebResponse errorResponse = ex.Response;
+                using (Stream responseStream = errorResponse.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream, System.Text.Encoding.GetEncoding("utf-8"));
+                    String errorText = reader.ReadToEnd();
+                    // log errorText
+                }
+                throw;
+            }*/
+
+
+
+            //return getcategoria.ToString();
+        }
+
+        /*public async void identificarPersona(string imageFilePath)
         {
             var client = new HttpClient();
             //var queryString = HttpUtility.ParseQueryString();
@@ -201,37 +259,24 @@ namespace Libreria.Controllers
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ServiceKey);
 
-            string uriBase = "https://eastus.api.cognitive.microsoft.com/face/v1.0/identify?";
-            //HttpResponseMessage response;
+            string uriBase = "https://eastus.api.cognitive.microsoft.com/face/v1.0/detect";
+            
+            var queryString = HttpUtility.ParseQueryString(string.Empty);
 
-            // The list of Face attributes to return.
-            string requestParameters = "returnFaceId=true";
-            string uri = uriBase + "?" + requestParameters;
+            // Request parameters
+            queryString["returnFaceId"] = "true";
+            string uri = uriBase + "?" + queryString;
 
             HttpResponseMessage response;
 
-            // Request body. Posts a locally stored JPEG image.
-            byte[] byteData = GetImageAsByteArray(imageFilePath);
+            byte[] byteData = Encoding.UTF8.GetBytes(imageFilePath);
 
-            using (ByteArrayContent content = new ByteArrayContent(byteData))
+            using (var content = new ByteArrayContent(byteData))
             {
-                // This example uses content type "application/octet-stream".
-                // The other content types you can use are "application/json"
-                // and "multipart/form-data".
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-
-                // Execute the REST API call.
-                response = await client.PostAsync(uri, content);
-
-                // Get the JSON response.
-                string contentString = await response.Content.ReadAsStringAsync();
-
-                // Display the JSON response.
-                //Console.WriteLine("\nResponse:\n");
-                //Console.WriteLine(JsonPrettyPrint(contentString));
-                //Console.WriteLine("\nPress Enter to exit...");
+                content.Headers.ContentType = new MediaTypeHeaderValue("<application/json >");
+                response = await client.PostAsync(uriBase, content);
             }
-        }
+        }*/
 
 
         static byte[] GetImageAsByteArray(string imageFilePath)
