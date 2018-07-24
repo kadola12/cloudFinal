@@ -29,9 +29,7 @@ namespace Libreria.Controllers
 
         private readonly IFaceClient faceClient = new FaceClient(new ApiKeyServiceClientCredentials(ServiceKey),new System.Net.Http.DelegatingHandler[] { });
 
-        IList<DetectedFace> faceList;   // The list of detected faces.
-        String[] faceDescriptions;      // The list of descriptions for the detected faces.
-        double resizeFactor;            // The resize factor for the displayed image.
+        
 
 
 
@@ -69,50 +67,61 @@ namespace Libreria.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(Persona persona, HttpPostedFileBase file)
         {
-            //if (ModelState.IsValid)
+            if(ModelState.IsValid)
+            {
+            //  string path = file.FileName;
+            //  Console.WriteLine(file.FileName);
+            //if (file != null){
             //{
-                //string path = file.FileName;
-                //Console.WriteLine(file.FileName);
-                //if (file != null)
-                //{
 
-                //Console.WriteLine("hola"+file.ToString());
+            //Console.WriteLine("hola"+file.ToString());
 
-                //return View(persona);
+            //return View(persona);
+            Console.WriteLine("Inicio");
+            //ViewBag.Message = System.IO.Path.GetFullPath(file.FileName).Length;
+                //return View();
                 try
-                {
-                    if (file != null)
                     {
-                        string fileName= System.IO.Path.GetFullPath(file.FileName);
-                        identificarPersona(fileName);
-                        //db.personas.Add(persona);
-                        //db.SaveChanges();
-                        return RedirectToAction("Index");
+                        string fileName = System.IO.Path.GetFullPath(file.FileName);
+                        if (fileName.Length > 0)
+                        {
+
+                            //ViewBag.Message="Lo logramos";
+                            //return View();
+                            identificarPersona(fileName);
+                            //db.personas.Add(persona);
+                            //db.SaveChanges();
+                            
+                            return RedirectToAction("Index");
+                        }
+                        else
+                        {
+                            
+                            ViewBag.Message=file.FileName;
+                            return View();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        return View(persona);
+                        ViewBag.Message = ex.ToString();
+                        return View();
+
                     }
-                }
-                catch
-                {
-                    ViewBag.Message = "No se pudo cargar la imagen";
-                    return View();
-                    
-                }
-                    //var fileName = Path.GetFileName(file.FileName);
-                    //Guarda el archivo
-                    //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
-                    //file.SaveAs(path);
-                    
+                //var fileName = Path.GetFileName(file.FileName);
+                //Guarda el archivo
+                //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+                //file.SaveAs(path);
+
                 //}
                 //Console.WriteLine(Request.Files.Count);
                 //return View("Index");
-            /*}
+            }
             else
             {
-                return View(persona);
-            }*/
+                ViewBag.Message = System.IO.Path.GetFullPath(file.FileName);
+                return View();
+            }
+
             
         }
 
@@ -184,52 +193,117 @@ namespace Libreria.Controllers
 
         
 
-        public void identificarPersona(string file)
+        public async void identificarPersona(string imageFilePath)
         {
             var client = new HttpClient();
             //var queryString = HttpUtility.ParseQueryString();
 
             // Request headers
-            //client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ServiceKey);
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ServiceKey);
 
-            string uri = "https://westus.api.cognitive.microsoft.com/face/v1.0/identify?";
+            string uriBase = "https://eastus.api.cognitive.microsoft.com/face/v1.0/identify?";
             //HttpResponseMessage response;
 
             // The list of Face attributes to return.
-            IList<FaceAttributeType> faceAttributes =new FaceAttributeType[]
-            {
-                FaceAttributeType.Gender, FaceAttributeType.Age,
-                FaceAttributeType.Smile, FaceAttributeType.Emotion,
-                FaceAttributeType.Glasses, FaceAttributeType.Hair
-            };
+            string requestParameters = "returnFaceId=true";
+            string uri = uriBase + "?" + requestParameters;
 
-            // Call the Face API.
-            try
-            {   
-                using (Stream imageFileStream = System.IO.File.OpenRead(file))
-                {
-                    // The second argument specifies to return the faceId, while
-                    // the third argument specifies not to return face landmarks.
-                    //IList<DetectedFace> faceList =faceClient.Face.DetectWithStreamAsync(imageFileStream, true, false, faceAttributes);
-                    //return faceList;
-                }
-            }
-            // Catch and display Face API errors.
-            catch (APIErrorException f)
-            {
-                //MessageBox.Show(f.Message);
-                //return new List<DetectedFace>();
-            }
-            // Catch and display all other errors.
-            catch (Exception e)
-            {
-                //MessageBox.Show(e.Message, "Error");
-                //return new List<DetectedFace>();
-            }
+            HttpResponseMessage response;
 
+            // Request body. Posts a locally stored JPEG image.
+            byte[] byteData = GetImageAsByteArray(imageFilePath);
+
+            using (ByteArrayContent content = new ByteArrayContent(byteData))
+            {
+                // This example uses content type "application/octet-stream".
+                // The other content types you can use are "application/json"
+                // and "multipart/form-data".
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                // Execute the REST API call.
+                response = await client.PostAsync(uri, content);
+
+                // Get the JSON response.
+                string contentString = await response.Content.ReadAsStringAsync();
+
+                // Display the JSON response.
+                //Console.WriteLine("\nResponse:\n");
+                //Console.WriteLine(JsonPrettyPrint(contentString));
+                //Console.WriteLine("\nPress Enter to exit...");
+            }
         }
 
-        
+
+        static byte[] GetImageAsByteArray(string imageFilePath)
+        {
+            using (FileStream fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read))
+            {
+                BinaryReader binaryReader = new BinaryReader(fileStream);
+                return binaryReader.ReadBytes((int)fileStream.Length);
+            }
+        }
+
+        static string JsonPrettyPrint(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+                return string.Empty;
+
+            json = json.Replace(Environment.NewLine, "").Replace("\t", "");
+
+            StringBuilder sb = new StringBuilder();
+            bool quote = false;
+            bool ignore = false;
+            int offset = 0;
+            int indentLength = 3;
+
+            foreach (char ch in json)
+            {
+                switch (ch)
+                {
+                    case '"':
+                        if (!ignore) quote = !quote;
+                        break;
+                    case '\'':
+                        if (quote) ignore = !ignore;
+                        break;
+                }
+
+                if (quote)
+                    sb.Append(ch);
+                else
+                {
+                    switch (ch)
+                    {
+                        case '{':
+                        case '[':
+                            sb.Append(ch);
+                            sb.Append(Environment.NewLine);
+                            sb.Append(new string(' ', ++offset * indentLength));
+                            break;
+                        case '}':
+                        case ']':
+                            sb.Append(Environment.NewLine);
+                            sb.Append(new string(' ', --offset * indentLength));
+                            sb.Append(ch);
+                            break;
+                        case ',':
+                            sb.Append(ch);
+                            sb.Append(Environment.NewLine);
+                            sb.Append(new string(' ', offset * indentLength));
+                            break;
+                        case ':':
+                            sb.Append(ch);
+                            sb.Append(' ');
+                            break;
+                        default:
+                            if (ch != ' ') sb.Append(ch);
+                            break;
+                    }
+                }
+            }
+
+            return sb.ToString().Trim();
+        }
 
     }
 
