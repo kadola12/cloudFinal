@@ -7,6 +7,9 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Libreria.Models;
+using System.Net.Http;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Libreria.Controllers
 {
@@ -46,16 +49,75 @@ namespace Libreria.Controllers
         // más información vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "IdPersona,IdLibro,FechaSalida,FechaDevolucion")] PersonaLibro personaLibro)
+        public async Task<ActionResult> Create([Bind(Include = "IdLibro,FechaSalida,FechaDevolucion")] PersonaLibro personaLibro, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
-                db.personaLibros.Add(personaLibro);
+                /*db.personaLibros.Add(personaLibro);
                 db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                return RedirectToAction("Index");*/
+                try
+                {
+                    //string fileName = file.FileName;
+                    if (file.ContentLength > 0)
+                    {
+                        var fileName = Path.GetFileName(file.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Fotos"), fileName);
+                        file.SaveAs(path);
+                        byte[] img = GetImageAsByteArray(path.ToString());
+                        //byte[] img = GetImageAsByteArray(fileName);
+                        string resultado = await UploadUserPictureApiCommand("http://libros.westeurope.cloudapp.azure.com/reconpersona", "[]", img);
+                        if (resultado.Equals("-1"))
+                        {
+                            ViewBag.Message = "Ingrese Primero a la persona";
+                            return View();
+                        }
+                        else if (resultado.Equals("-2"))
+                        {
+                            ViewBag.Message = "Seleccione una foto mas clara";
+                            return View();
+                        }
+                        else
+                        {
+                            var query = from contact in db.fotoPersonas where contact.faceId == resultado select contact;
 
-            return View(personaLibro);
+
+                            List<FotoPersona> lista = query.ToList<FotoPersona>();     
+                              
+
+                            //var fotoPersona = db.fotoPersonas.SqlQuery(query).ToList();
+
+                            string idPersona = lista[0].idPersona.ToString();
+                            personaLibro.IdPersona = idPersona;
+
+                            db.personaLibros.Add(personaLibro);
+                            db.SaveChanges();
+                            
+                            return RedirectToAction("Index");
+                            /*ViewBag.Message = personaLibro.FechaSalida;
+                            return View();*/
+                        }
+
+                    }
+                    else
+                    {
+                        ViewBag.Message = "Seleccione Foto";
+                        return View();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = ex.ToString();
+                    return View();
+
+                }
+            }
+            else
+            {
+                ViewBag.Message = "Datos Incorrectos";
+                return View();
+            }
+            
         }
 
         // GET: PersonaLibroes/Edit/5
@@ -122,6 +184,42 @@ namespace Libreria.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+
+        static byte[] GetImageAsByteArray(string imageFilePath)
+        {
+            using (FileStream fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read))
+            {
+                BinaryReader binaryReader = new BinaryReader(fileStream);
+                return binaryReader.ReadBytes((int)fileStream.Length);
+            }
+        }
+
+
+
+        public async Task<string> UploadUserPictureApiCommand(string api, string json, byte[] picture)
+        {
+            using (var httpClient = new HttpClient())
+            {
+
+                MultipartFormDataContent form = new MultipartFormDataContent();
+
+                form.Add(new StringContent(json), "payload");
+                form.Add(new ByteArrayContent(picture, 0, picture.Count()), "upload", "user_picture.jpg");
+                HttpResponseMessage response = await httpClient.PostAsync(api, form);
+                response.EnsureSuccessStatusCode();
+                Task<string> responseBody = response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode.ToString() != "OK")
+                {
+                    return "ERROR: " + response.StatusCode.ToString();
+                }
+                else
+                {
+                    return responseBody.Result.ToString();
+                }
+            }
         }
     }
 }

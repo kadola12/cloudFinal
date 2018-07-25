@@ -1,16 +1,19 @@
 ﻿@model IEnumerable<Libreria.Models.PersonaLibro>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Gestion de Prestamos";
 }
 
-<h2>Index</h2>
+<h2>Gestion de Prestamos</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Crear Nuevo Prestamo", "Create")
 </p>
 <table class="table">
     <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.IdPersona)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.IdLibro)
         </th>
@@ -26,6 +29,9 @@
 @foreach (var item in Model) {
     <tr>
         <td>
+            @Html.DisplayFor(modelItem => item.IdPersona)
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.IdLibro)
         </td>
         <td>
@@ -35,9 +41,9 @@
             @Html.DisplayFor(modelItem => item.FechaDevolucion)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.IdPersona }) |
-            @Html.ActionLink("Details", "Details", new { id=item.IdPersona }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.IdPersona })
+            @Html.ActionLink("Editar", "Edit", new { id=item.IdPersona }) |
+            @Html.ActionLink("Detalles", "Details", new { id=item.IdPersona }) |
+            @Html.ActionLink("Eliminar", "Delete", new { id=item.IdPersona })
         </td>
     </tr>
 }
