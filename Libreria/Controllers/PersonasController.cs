@@ -19,6 +19,7 @@ using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using System.IO;
 using System.Windows.Input;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 //https://www.mikesdotnetting.com/article/259/asp-net-mvc-5-with-ef-6-working-with-files
 
 namespace Libreria.Controllers
@@ -58,6 +59,13 @@ namespace Libreria.Controllers
         // GET: Personas/Create
         public ActionResult Create()
         {
+            List<SelectListItem> lst = new List<SelectListItem>();
+
+            lst.Add(new SelectListItem() { Text = "Femenino", Value = "0" });
+            lst.Add(new SelectListItem() { Text = "Masculino", Value = "1" });
+
+            ViewBag.Genero = lst;
+
             return View();
         }
 
@@ -66,65 +74,42 @@ namespace Libreria.Controllers
         // más información vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Persona persona, HttpPostedFileBase file)
+        public async Task<ActionResult> Create(Persona persona, HttpPostedFileBase file)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-            //  string path = file.FileName;
-            //  Console.WriteLine(file.FileName);
-            //if (file != null){
-            //{
-
-            //Console.WriteLine("hola"+file.ToString());
-
-            //return View(persona);
-            //Console.WriteLine("Inicio");
-            //ViewBag.Message = System.IO.Path.GetFullPath(file.FileName);
-            //return View();
                 try
+                {
+                    //string fileName = file.FileName;
+                    if (file.ContentLength > 0)
                     {
-                        string fileName = System.IO.Path.GetFullPath(file.FileName);
-                        if (fileName.Length > 0)
-                        {
-
-                            //ViewBag.Message="Lo logramos";
-                            //return View();
-                            //identificarPersona(fileName);
-                            //db.personas.Add(persona);
-                            //db.SaveChanges();
-                            
-                            ViewBag.Message = identificarPersona(fileName);
-                            return View();
-                        }
-                        else
-                        {
-                            
-                            ViewBag.Message=file.FileName;
-                            return View();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ViewBag.Message = ex.ToString();
+                        var fileName = Path.GetFileName(file.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Fotos"), fileName);
+                        file.SaveAs(path);
+                        byte[] img = GetImageAsByteArray(path.ToString());
+                        //byte[] img = GetImageAsByteArray(fileName);
+                        await UploadUserPictureApiCommand("http://libros.westeurope.cloudapp.azure.com/reconpersona", "[]", img);
+                        ViewBag.Message = path;
                         return View();
-
                     }
-                //var fileName = Path.GetFileName(file.FileName);
-                //Guarda el archivo
-                //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
-                //file.SaveAs(path);
+                    else
+                    {
+                        ViewBag.Message = "Seleccione Foto";
+                        return View();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = ex.ToString();
+                    return View();
 
-                //}
-                //Console.WriteLine(Request.Files.Count);
-                //return View("Index");
+                }
             }
             else
             {
-                ViewBag.Message = System.IO.Path.GetFullPath(file.FileName);
+                ViewBag.Message = "Modelo Invalido";
                 return View();
             }
-
-            
         }
 
         // GET: Personas/Edit/5
@@ -350,6 +335,31 @@ namespace Libreria.Controllers
             return sb.ToString().Trim();
         }
 
+        public async Task<string> UploadUserPictureApiCommand(string api, string json, byte[] picture)
+        {
+            using (var httpClient = new HttpClient())
+            {
+
+                MultipartFormDataContent form = new MultipartFormDataContent();
+
+                form.Add(new StringContent(json), "payload");
+                form.Add(new ByteArrayContent(picture, 0, picture.Count()), "upload", "user_picture.jpg");
+                HttpResponseMessage response = await httpClient.PostAsync(api, form);
+                response.EnsureSuccessStatusCode();
+                Task<string> responseBody = response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode.ToString() != "OK")
+                {
+                    return "ERROR: " + response.StatusCode.ToString();
+                }
+                else
+                {
+                    return "SUCCES: " + responseBody.Result.ToString();
+                }
+            }
+        }
+
     }
+
 
 }

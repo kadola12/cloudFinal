@@ -173,6 +173,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LibreriasController.cs" />
     <Compile Include="Controllers\LibroesController.cs" />
+    <Compile Include="Controllers\PersonaLibroesController.cs" />
     <Compile Include="Controllers\PersonasController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -294,9 +295,15 @@
     <Content Include="Views\Libroes\Details.cshtml" />
     <Content Include="Views\Libroes\Edit.cshtml" />
     <Content Include="Views\Libroes\Index.cshtml" />
+    <Content Include="Views\PersonaLibroes\Create.cshtml" />
+    <Content Include="Views\PersonaLibroes\Delete.cshtml" />
+    <Content Include="Views\PersonaLibroes\Details.cshtml" />
+    <Content Include="Views\PersonaLibroes\Edit.cshtml" />
+    <Content Include="Views\PersonaLibroes\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Fotos\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
