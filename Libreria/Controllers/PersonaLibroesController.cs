@@ -61,11 +61,16 @@ namespace Libreria.Controllers
                     //string fileName = file.FileName;
                     if (file.ContentLength > 0)
                     {
+
+                        
+
                         var fileName = Path.GetFileName(file.FileName);
                         var path = Path.Combine(Server.MapPath("~/Fotos"), fileName);
+
+                        //var path = "~/Fotos/"+fileName;
                         file.SaveAs(path);
                         byte[] img = GetImageAsByteArray(path.ToString());
-                        //byte[] img = GetImageAsByteArray(fileName);
+                        //byte[] img = GetImageAsByteArray(Path.GetTempPath()+fileName);
                         string resultado = await UploadUserPictureApiCommand("http://libros.westeurope.cloudapp.azure.com/reconpersona", "[]", img);
                         if (resultado.Equals("-1"))
                         {

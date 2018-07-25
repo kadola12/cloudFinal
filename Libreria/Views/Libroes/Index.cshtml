@@ -21,10 +21,10 @@
             @Html.DisplayNameFor(model => model.Anio)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Foto)
+            @Html.DisplayNameFor(model => model.Editorial)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Editorial)
+            @Html.DisplayNameFor(model => model.Foto)
         </th>
         <th></th>
     </tr>
@@ -44,10 +44,10 @@
             @Html.DisplayFor(modelItem => item.Anio)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Foto)
+            @Html.DisplayFor(modelItem => item.Editorial)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Editorial)
+            <a href="http://libreriasa.blob.core.windows.net/cover/@item.Foto">SomeSite</a>
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
